@@ -2,9 +2,18 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Calendar } from 'lucide-react';
+import { useEffect } from 'react';
+import useStore from '../store/useStore';
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { user, role } = useStore();
+
+  useEffect(() => {
+    if (user) {
+      navigate(role === 'OWNER' ? '/owner/dashboard' : '/dashboard');
+    }
+  }, [user, role, navigate]);
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white relative overflow-hidden flex flex-col">
@@ -61,21 +70,23 @@ export default function Landing() {
           </h1>
           
           <p className="text-xl md:text-2xl text-zinc-400 max-w-2xl mx-auto mb-12">
-            Meet Without The Maze is your smart conflict-resolving scheduling assistant. 
+            MazeOut is your smart conflict-resolving scheduling assistant. 
             Book exactly what you need, without the friction.
           </p>
 
-          <motion.div 
-            whileHover={{ scale: 1.05 }} 
-            whileTap={{ scale: 0.95 }}
-          >
-            <Button 
-              onClick={() => navigate('/login')}
-              className="text-lg px-8 py-4 bg-gradient-to-r from-rose-500 to-fuchsia-600 hover:from-rose-600 hover:to-fuchsia-700 shadow-2xl shadow-rose-500/20"
+          <div className="flex justify-center">
+            <motion.div 
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.95 }}
             >
-              Get Started for Free
-            </Button>
-          </motion.div>
+              <Button 
+                onClick={() => navigate('/login')}
+                className="text-lg px-8 py-4 bg-gradient-to-r from-rose-500 to-fuchsia-600 hover:from-rose-600 hover:to-fuchsia-700 shadow-2xl shadow-rose-500/20"
+              >
+                Get Started for Free
+              </Button>
+            </motion.div>
+          </div>
         </motion.div>
       </main>
 

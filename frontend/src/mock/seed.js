@@ -18,16 +18,16 @@ export const equipmentList = [
 ];
 
 export const rooms = [
-  { id: 1, name: 'Orion', floor: 1, capacity: 4, isActive: true, baseScore: 90, equipment: [1, 2], ratings: [], pricingType: 'FREE' },
-  { id: 2, name: 'Nebula', floor: 1, capacity: 6, isActive: true, baseScore: 85, equipment: [2, 5, 6], ratings: [], pricingType: 'FREE' },
-  { id: 3, name: 'Atlas', floor: 2, capacity: 12, isActive: true, baseScore: 95, equipment: [1, 2, 3, 4], ratings: [], pricingType: 'HOURLY', pricePerHour: 500 },
-  { id: 4, name: 'Zen Den', floor: 2, capacity: 2, isActive: true, baseScore: 88, equipment: [2], ratings: [], pricingType: 'FREE' },
-  { id: 5, name: 'Boardroom Prime', floor: 3, capacity: 20, isActive: true, baseScore: 98, equipment: [1, 2, 3, 4, 5, 6], ratings: [], pricingType: 'DAILY', pricePerDay: 4000 },
-  { id: 6, name: 'Innovation Lab', floor: 3, capacity: 40, isActive: true, baseScore: 92, equipment: [1, 2, 3, 4, 5, 6, 7], ratings: [], pricingType: 'BOTH', pricePerHour: 800, pricePerDay: 5000 },
-  { id: 7, name: 'Apollo', floor: 1, capacity: 8, isActive: true, baseScore: 80, equipment: [1, 2, 6], ratings: [], pricingType: 'FREE' },
-  { id: 8, name: 'Voyager', floor: 1, capacity: 4, isActive: true, baseScore: 75, equipment: [5], ratings: [], pricingType: 'FREE' },
-  { id: 9, name: 'Gemini', floor: 2, capacity: 6, isActive: false, baseScore: 0, equipment: [], ratings: [], pricingType: 'FREE' }, // Under maintenance
-  { id: 10, name: 'Titan', floor: 4, capacity: 15, isActive: true, baseScore: 89, equipment: [1, 2, 3, 7], ratings: [], pricingType: 'HOURLY', pricePerHour: 600 },
+  { id: 1, name: 'Orion', floor: 1, capacity: 20, isActive: true, baseScore: 90, equipment: [1, 2], ratings: [], pricingType: 'HOURLY', pricePerHour: 250 },
+  { id: 2, name: 'Nebula', floor: 1, capacity: 35, isActive: true, baseScore: 85, equipment: [2, 5, 6], ratings: [], pricingType: 'HOURLY', pricePerHour: 400 },
+  { id: 3, name: 'Atlas', floor: 2, capacity: 50, isActive: true, baseScore: 95, equipment: [1, 2, 3, 4], ratings: [], pricingType: 'HOURLY', pricePerHour: 500 },
+  { id: 4, name: 'Zen Den', floor: 2, capacity: 25, isActive: true, baseScore: 88, equipment: [2], ratings: [], pricingType: 'HOURLY', pricePerHour: 200 },
+  { id: 5, name: 'Boardroom Prime', floor: 3, capacity: 100, isActive: true, baseScore: 98, equipment: [1, 2, 3, 4, 5, 6], ratings: [], pricingType: 'DAILY', pricePerDay: 4000 },
+  { id: 6, name: 'Innovation Lab', floor: 3, capacity: 250, isActive: true, baseScore: 92, equipment: [1, 2, 3, 4, 5, 6, 7], ratings: [], pricingType: 'BOTH', pricePerHour: 800, pricePerDay: 5000 },
+  { id: 7, name: 'Apollo', floor: 1, capacity: 80, isActive: true, baseScore: 80, equipment: [1, 2, 6], ratings: [], pricingType: 'HOURLY', pricePerHour: 900 },
+  { id: 8, name: 'Voyager', floor: 1, capacity: 30, isActive: true, baseScore: 75, equipment: [5], ratings: [], pricingType: 'HOURLY', pricePerHour: 350 },
+  { id: 9, name: 'Gemini', floor: 2, capacity: 40, isActive: false, baseScore: 0, equipment: [], ratings: [], pricingType: 'HOURLY', pricePerHour: 400 }, // Under maintenance
+  { id: 10, name: 'Titan', floor: 4, capacity: 450, isActive: true, baseScore: 89, equipment: [1, 2, 3, 7], ratings: [], pricingType: 'HOURLY', pricePerHour: 600 },
 ];
 
 export const initialMeetings = [

@@ -10,11 +10,11 @@ $headers = @{ Authorization = "Bearer $token" }
 
 Write-Host "`n=== 2. Booking Meeting A ===" -ForegroundColor Cyan
 $bodyA = @{
-    title = "Meeting A"
-    roomId = 1
-    startTime = "2026-10-15 10:00:00"
-    endTime = "2026-10-15 11:00:00"
-    attendees = 4
+    title          = "Meeting A"
+    roomId         = 1
+    startTime      = "2026-10-15 10:00:00"
+    endTime        = "2026-10-15 11:00:00"
+    attendees      = 4
     participantIds = @(3, 4)
 } | ConvertTo-Json
 $meetingAResponse = Invoke-RestMethod -Method Post -Uri "$baseUrl/meetings" -Headers $headers -ContentType "application/json" -Body $bodyA
@@ -23,18 +23,19 @@ Write-Host "✅ Meeting A Booked Successfully! ID: $meetingAId" -ForegroundColor
 
 Write-Host "`n=== 3. Attempting to Book Overlapping Meeting B ===" -ForegroundColor Cyan
 $bodyB = @{
-    title = "Meeting B (Overlap)"
-    roomId = 1
-    startTime = "2026-10-15 10:30:00"
-    endTime = "2026-10-15 11:30:00"
-    attendees = 4
+    title          = "Meeting B (Overlap)"
+    roomId         = 1
+    startTime      = "2026-10-15 10:30:00"
+    endTime        = "2026-10-15 11:30:00"
+    attendees      = 4
     participantIds = @()
 } | ConvertTo-Json
 
 try {
     $null = Invoke-RestMethod -Method Post -Uri "$baseUrl/meetings" -Headers $headers -ContentType "application/json" -Body $bodyB
     Write-Host "❌ UH OH! Meeting B was booked, but it should have failed!" -ForegroundColor Red
-} catch {
+}
+catch {
     # Extract the JSON error message
     $streamReader = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
     $errorJson = $streamReader.ReadToEnd() | ConvertFrom-Json
@@ -57,8 +58,26 @@ Write-Host "✅ Meeting B Booked Successfully! ID: $($meetingBResponse.data.meet
 Write-Host "`n=== 6. Testing RoomBot AI ===" -ForegroundColor Cyan
 $bodyBot = @{
     sessionId = "demo-chat-123"
-    text = "Book a room tomorrow at 3pm for 5 people"
+    text      = "Book a room tomorrow at 3pm for 5 people"
 } | ConvertTo-Json
 $botResponse = Invoke-RestMethod -Method Post -Uri "$baseUrl/roombot/message" -Headers $headers -ContentType "application/json" -Body $bodyBot
 Write-Host "🤖 RoomBot replied: $($botResponse.data.reply.text)" -ForegroundColor Magenta
+
+Write-Host "`n=== 7. Testing History Section (GET /meetings) ===" -ForegroundColor Cyan
+$historyResponse = Invoke-RestMethod -Method Get -Uri "$baseUrl/meetings" -Headers $headers
+$historyCount = $historyResponse.data.Count
+Write-Host "✅ History fetched successfully! Found $historyCount bookings for user." -ForegroundColor Green
+if ($historyCount -gt 0) {
+    Write-Host "Most recent booking: $($historyResponse.data[0].title) (Status: $($historyResponse.data[0].status))" -ForegroundColor Yellow
+}
+
+Write-Host "`n=== 8. Testing Calendar Section (GET Room Schedule) ===" -ForegroundColor Cyan
+$calendarDate = "2026-10-15"
+$calendarResponse = Invoke-RestMethod -Method Get -Uri "$baseUrl/rooms/1/schedule?date=$calendarDate" -Headers $headers
+$calendarCount = $calendarResponse.data.Count
+Write-Host "✅ Calendar fetched successfully for Room 1 on $calendarDate! Found $calendarCount active bookings." -ForegroundColor Green
+if ($calendarCount -gt 0) {
+    Write-Host "First booking in calendar: $($calendarResponse.data[0].title)" -ForegroundColor Yellow
+}
+
 Write-Host "`n🎉 ALL TESTS PASSED!" -ForegroundColor Green

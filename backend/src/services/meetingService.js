@@ -126,6 +126,25 @@ const createMeeting = async (userId, request) => {
     }
 
     await conn.commit();
+
+    // Trigger confirmation email
+    try {
+        const [users] = await pool.query('SELECT email FROM users WHERE id = ?', [userId]);
+        if (users.length > 0) {
+            const { sendBookingConfirmation } = require('./emailService');
+            // send asynchronously so it doesn't block the response
+            sendBookingConfirmation(users[0].email, {
+                title,
+                roomName: room.name,
+                startTime,
+                endTime,
+                priceNote: note
+            });
+        }
+    } catch(err) {
+        console.error('Failed to send confirmation email:', err);
+    }
+
     return { meetingId, checkinToken, totalCost };
   } catch (err) {
     await conn.rollback();

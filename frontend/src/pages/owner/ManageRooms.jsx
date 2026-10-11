@@ -61,10 +61,10 @@ export default function ManageRooms() {
       </div>
 
       {/* Room Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
         {rooms.map((room, i) => (
-          <motion.div key={room.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <Card className="p-5 relative group">
+          <motion.div key={room.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="h-full">
+            <Card className="p-5 relative group h-full flex flex-col">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <h3 className="font-bold text-lg">{room.name}</h3>
@@ -82,15 +82,15 @@ export default function ManageRooms() {
                 {room.pricingType === 'BOTH' && `₹${room.pricePerHour}/hr or ₹${room.pricePerDay}/day`}
               </div>
 
-              <div className="flex flex-wrap gap-1.5 mb-4">
+              <div className="flex flex-wrap gap-1.5 mb-4 flex-1">
                 {room.equipment.map(eId => {
                   const eq = equipmentList.find(e => e.id === eId);
-                  return eq ? <span key={eId} className="px-2 py-0.5 text-xs rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">{eq.name}</span> : null;
+                  return eq ? <span key={eId} className="px-2 py-0.5 text-xs rounded-full bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 h-fit">{eq.name}</span> : null;
                 })}
                 {room.equipment.length === 0 && <span className="text-xs text-zinc-400">No equipment</span>}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 mt-auto pt-3 border-t border-zinc-100 dark:border-zinc-700/50">
                 <Button variant="ghost" className="flex-1 text-sm" onClick={() => openEdit(room)}><Pencil size={14} className="mr-1" /> Edit</Button>
                 <Button variant="danger" className="text-sm px-3" onClick={() => handleDelete(room)}><Trash2 size={14} /></Button>
               </div>
@@ -129,10 +129,10 @@ export default function ManageRooms() {
                 <div>
                   <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-1">Pricing Type</label>
                   <select value={form.pricingType} onChange={e => setForm({...form, pricingType: e.target.value})} className={inputClass}>
-                    <option value="FREE">Free</option>
-                    <option value="HOURLY">Hourly</option>
-                    <option value="DAILY">Daily</option>
-                    <option value="BOTH">Both (Hourly + Daily)</option>
+                    <option className="bg-white dark:bg-zinc-800" value="FREE">Free</option>
+                    <option className="bg-white dark:bg-zinc-800" value="HOURLY">Hourly</option>
+                    <option className="bg-white dark:bg-zinc-800" value="DAILY">Daily</option>
+                    <option className="bg-white dark:bg-zinc-800" value="BOTH">Both (Hourly + Daily)</option>
                   </select>
                 </div>
                 {(form.pricingType === 'HOURLY' || form.pricingType === 'BOTH') && (

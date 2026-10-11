@@ -38,7 +38,7 @@ const requireOwnerOrAdmin = (req, res, next) => {
 router.post('/auth/register', [
     body('name').notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+    body('password').isLength({ min: 5 }).withMessage('Password must be at least 5 characters')
 ], validate, async (req, res, next) => {
     try {
         // Prevent users from setting themselves as ADMIN

@@ -1,16 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useStore from '../store/useStore';
 import { Button } from '../components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { users } from '../mock/seed';
-import { Calendar, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { api } from '../api/apiClient';
+import { Calendar, ArrowLeft, Eye, EyeOff, X, UserCircle } from 'lucide-react';
+
+const SAVED_ACCOUNTS_KEY = 'mazeout_saved_accounts';
+
+function getSavedAccounts() {
+  try {
+    const raw = localStorage.getItem(SAVED_ACCOUNTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAccount(email) {
+  const accounts = getSavedAccounts();
+  // Add to front, remove duplicates, keep max 5
+  const updated = [email, ...accounts.filter(a => a !== email)].slice(0, 5);
+  localStorage.setItem(SAVED_ACCOUNTS_KEY, JSON.stringify(updated));
+}
+
+function removeAccount(email) {
+  const accounts = getSavedAccounts().filter(a => a !== email);
+  localStorage.setItem(SAVED_ACCOUNTS_KEY, JSON.stringify(accounts));
+}
 
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login } = useStore();
+  const { login, user, role: currentRole } = useStore();
   
+  useEffect(() => {
+    if (user) {
+      navigate(currentRole === 'OWNER' ? '/owner/dashboard' : '/dashboard');
+    }
+  }, [user, currentRole, navigate]);
+
   const initialMode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
   const [mode, setMode] = useState(initialMode);
   const [role, setRole] = useState('USER');
@@ -20,10 +49,28 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
+  const [savedAccounts, setSavedAccounts] = useState([]);
+
+  // Load saved accounts on mount
+  useEffect(() => {
+    setSavedAccounts(getSavedAccounts());
+  }, []);
 
   const handleRoleSwitch = (newRole) => {
     setRole(newRole);
     setError('');
+  };
+
+  const handlePickSavedAccount = (savedEmail) => {
+    setEmail(savedEmail);
+    setError('');
+  };
+
+  const handleRemoveSavedAccount = (e, savedEmail) => {
+    e.stopPropagation();
+    removeAccount(savedEmail);
+    setSavedAccounts(getSavedAccounts());
   };
 
   const handleSubmit = async (e) => {
@@ -40,28 +87,31 @@ export default function Login() {
     }
 
     setLoading(true);
-    await new Promise(r => setTimeout(r, 900));
 
-    const u = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-    if (mode === 'login') {
-      if (!u) {
-        setError('No account found with this email.');
-        setLoading(false);
-        return;
+    try {
+      if (mode === 'login') {
+        const data = await api.login({ email, password });
+        // Save or remove account based on "Remember me" checkbox
+        if (rememberMe) {
+          saveAccount(email);
+        }
+        login(data.user, data.token);
+        localStorage.setItem('token', data.token); // Store token for apiClient
+        navigate(data.user.role === 'OWNER' ? '/owner/dashboard' : '/dashboard');
+      } else {
+        // Signup
+        const data = await api.register({ name, email, password, role });
+        if (rememberMe) {
+          saveAccount(email);
+        }
+        login(data.user, data.token);
+        if (data.token) localStorage.setItem('token', data.token);
+        navigate(data.user.role === 'OWNER' ? '/owner/dashboard' : '/dashboard');
       }
-      login(u, 'mock-jwt-token');
-      navigate(u.role === 'OWNER' ? '/owner/dashboard' : '/dashboard');
-    } else {
-      // Signup — simulate account creation
-      if (u) {
-        setError('An account with this email already exists. Try logging in.');
-        setLoading(false);
-        return;
-      }
-      const newUser = { id: Date.now(), name, email, role, department: 'General' };
-      login(newUser, 'mock-jwt-token');
-      navigate(role === 'OWNER' ? '/owner/dashboard' : '/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'An error occurred.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,6 +195,66 @@ export default function Login() {
               {mode === 'login' ? 'Enter your credentials to access your workspace.' : 'Get started with MazeOut in seconds.'}
             </p>
 
+            {/* Saved accounts section (login mode only) */}
+            <AnimatePresence>
+              {mode === 'login' && savedAccounts.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6"
+                >
+                  <label className="block text-sm font-medium text-zinc-400 mb-2.5">
+                    Sign in as a previous user
+                  </label>
+                  <div className="space-y-2">
+                    {savedAccounts.map((savedEmail) => (
+                      <motion.div
+                        key={savedEmail}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => handlePickSavedAccount(savedEmail)}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 group cursor-pointer ${
+                          email === savedEmail
+                            ? 'border-rose-500/50 bg-rose-500/10 ring-1 ring-rose-500/30'
+                            : 'border-zinc-700/50 bg-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-800'
+                        }`}
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          email === savedEmail
+                            ? 'bg-rose-500/20 text-rose-400'
+                            : 'bg-zinc-700/50 text-zinc-400 group-hover:text-zinc-300'
+                        }`}>
+                          <UserCircle size={20} />
+                        </div>
+                        <span className={`text-sm font-medium truncate flex-1 text-left ${
+                          email === savedEmail ? 'text-rose-300' : 'text-zinc-300'
+                        }`}>
+                          {savedEmail}
+                        </span>
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => handleRemoveSavedAccount(e, savedEmail)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-zinc-600/50 text-zinc-500 hover:text-zinc-300 flex-shrink-0 cursor-pointer"
+                          title="Remove saved account"
+                        >
+                          <X size={14} />
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-3 my-5">
+                    <div className="flex-1 h-px bg-zinc-700/50"></div>
+                    <span className="text-xs text-zinc-600 font-medium uppercase tracking-wider">or enter manually</span>
+                    <div className="flex-1 h-px bg-zinc-700/50"></div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Role toggle */}
             <div className="bg-zinc-800 p-1 rounded-xl flex mb-6 border border-zinc-700/50">
               <button 
@@ -209,6 +319,31 @@ export default function Login() {
                 </div>
               </div>
 
+              {/* Remember me checkbox */}
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setRememberMe(!rememberMe)}
+                  className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+                    rememberMe
+                      ? 'bg-rose-500 border-rose-500 text-white'
+                      : 'border-zinc-600 bg-transparent hover:border-zinc-500'
+                  }`}
+                >
+                  {rememberMe && (
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+                <label
+                  onClick={() => setRememberMe(!rememberMe)}
+                  className="text-sm text-zinc-400 cursor-pointer select-none hover:text-zinc-300 transition-colors"
+                >
+                  Remember this email for next time
+                </label>
+              </div>
+
               <motion.button
                 type="submit"
                 disabled={loading}
@@ -232,7 +367,7 @@ export default function Login() {
 
               {/* Hint text */}
               <p className="text-xs text-zinc-600 text-center mt-4">
-                Demo credentials: <span className="text-zinc-400">asha@corp.com</span> (User) or <span className="text-zinc-400">admin@corp.com</span> (Owner)
+                Demo credentials: <span className="text-zinc-400">client@test.com</span> (pwd: client) or <span className="text-zinc-400">owner@test.com</span> (pwd: owner)
               </p>
             </form>
           </motion.div>

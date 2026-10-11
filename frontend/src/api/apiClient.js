@@ -48,5 +48,22 @@ export const api = {
     if (USE_MOCK) return await engine.cancelMeeting(id);
     const res = await client.patch(`/meetings/${id}/cancel`, { reason: 'User cancelled' });
     return res.data;
+  },
+
+  login: async (credentials) => {
+    if (USE_MOCK) {
+      // Return dummy token if mock
+      return { token: 'mock-token', user: { id: 1, name: 'Mock User', role: 'USER' } };
+    }
+    const res = await client.post('/auth/login', credentials);
+    return res.data.data;
+  },
+
+  register: async (userData) => {
+    if (USE_MOCK) {
+      return { token: 'mock-token', user: { id: 2, name: userData.name, role: userData.role } };
+    }
+    const res = await client.post('/auth/register', userData);
+    return res.data.data;
   }
 };

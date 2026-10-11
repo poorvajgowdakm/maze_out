@@ -92,18 +92,6 @@ export default function OwnerDashboard() {
         </div>
       </Card>
 
-      {/* Maintenance alert */}
-      {seedRooms.some(r => !r.isActive) && (
-        <Card className="p-5 border-l-4 border-amber-500 bg-amber-50/50 dark:bg-amber-900/10">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="text-amber-500" size={22} />
-            <div>
-              <p className="font-semibold text-amber-800 dark:text-amber-400">Rooms Under Maintenance</p>
-              <p className="text-sm text-amber-700 dark:text-amber-300/70">{seedRooms.filter(r => !r.isActive).map(r => r.name).join(', ')} — currently offline.</p>
-            </div>
-          </div>
-        </Card>
-      )}
     </div>
   );
 }

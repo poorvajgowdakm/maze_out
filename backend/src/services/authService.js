@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const register = async ({ name, email, password, department = null, role = 'USER' }) => {
   if (!name || !email || !password) throw new Error('Name, email, and password are required');
-  if (password.length < 6) throw new Error('Password must be at least 6 characters');
+  if (password.length < 5) throw new Error('Password must be at least 5 characters');
 
   const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
   if (existing.length > 0) throw new Error('Email already registered');

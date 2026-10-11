@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $baseUrl = "http://localhost:5000/api/v1"
 
 Write-Host "`n=== 1. Logging In as Owner ===" -ForegroundColor Cyan
-$loginResponse = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/login" -ContentType "application/json" -Body '{"email":"owner1@test.com","password":"owner123"}'
+$loginResponse = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/login" -ContentType "application/json" -Body '{"email":"arjun@venuehub.in","password":"owner123"}'
 $token = $loginResponse.data.token
 Write-Host "✅ Logged in as Owner1! Token acquired." -ForegroundColor Green
 

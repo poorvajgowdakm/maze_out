@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useStore from '../store/useStore';
 import { RoomCard } from '../components/RoomCard';
 import { motion } from 'framer-motion';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 export default function Rooms() {
   const { rooms } = useStore();
@@ -24,19 +24,20 @@ export default function Rooms() {
         </div>
         <div className="flex gap-2">
            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -tranzinc-y-1/2 text-zinc-400" size={18} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
               <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search rooms..." className="pl-10 pr-4 py-2 w-full md:w-64 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-rose-500 outline-none" />
            </div>
            <select value={floor} onChange={e=>setFloor(e.target.value)} className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
-              <option value="All">All Floors</option>
-              <option value="1">Floor 1</option>
-              <option value="2">Floor 2</option>
-              <option value="3">Floor 3</option>
+              <option className="bg-white dark:bg-zinc-800" value="All">All Floors</option>
+              <option className="bg-white dark:bg-zinc-800" value="1">Floor 1</option>
+              <option className="bg-white dark:bg-zinc-800" value="2">Floor 2</option>
+              <option className="bg-white dark:bg-zinc-800" value="3">Floor 3</option>
+              <option className="bg-white dark:bg-zinc-800" value="4">Floor 4</option>
            </select>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 items-stretch">
         {filtered.map((room, i) => (
            <motion.div key={room.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="h-full">
                <RoomCard room={room} />
